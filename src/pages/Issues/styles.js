@@ -28,6 +28,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     borderRadius: metrics.baseRadius,
   },
+  tab: {
+    backgroundColor: colors.regular,
+  },
+  tabsactiveyes: {
+    color: colors.white,
+  },
+  tabsactiveno: {
+    color: colors.black,
+  },
 });
 
 export default styles;

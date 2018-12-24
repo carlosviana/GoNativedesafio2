@@ -60,7 +60,7 @@ class Issues extends Component {
     const data = navigation.getParam('repository');
     return (
       <View style={styles.container}>
-        <StatusBar barStyle="dark-content" />
+        <StatusBar barStyle="default" />
         <View style={styles.header}>
           <TouchableOpacity
             onPress={() => {
