@@ -1,5 +1,4 @@
 import { StyleSheet } from 'react-native';
-
 import { colors, metrics } from '~/styles';
 
 const styles = StyleSheet.create({
@@ -23,11 +22,11 @@ const styles = StyleSheet.create({
   infoContainer: {
     flex: 1,
   },
-  name: {
+  title: {
     fontSize: 16,
     fontWeight: 'bold',
   },
-  company: {
+  subtitle: {
     fontSize: 12,
     color: colors.regular,
   },

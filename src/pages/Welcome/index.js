@@ -1,6 +1,13 @@
 import React, { Component } from 'react';
 import {
-  View, Text, TextInput, TouchableOpacity, StatusBar, FlatList,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StatusBar,
+  FlatList,
+  ActivityIndicator,
+  AsyncStorage,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import api from '~/services/api';
@@ -14,25 +21,56 @@ export default class Welcome extends Component {
     repository: '',
     repositories: [],
     refreshing: false,
+    loading: false,
+    error: false,
   };
+
+  async componentDidMount() {
+    await this.loadStorage();
+  }
 
   loadRepositories = async () => {
-    this.setState({ refreshing: true });
-    const { repository } = this.state;
-    const { data } = await api.get(`/repos/${repository}`);
-    const repo = {
-      id: data.id,
-      avatar_url: data.owner.avatar_url,
-      name: data.name,
-      company: data.full_name,
-    };
-    this.setState({ repositories: [...this.state.repositories, repo], refreshing: false });
+    this.setState({ refreshing: true, loading: true });
+    const { repository, repositories } = this.state;
+    try {
+      const { data } = await api.get(`/repos/${repository}`);
+      const repo = {
+        id: data.id,
+        avatar_url: data.owner.avatar_url,
+        name: data.name,
+        company: data.full_name,
+      };
+      this.setState({
+        repositories: [...repositories, repo],
+        refreshing: false,
+        loading: false,
+        error: false,
+        repository: '',
+      });
+      await this.saveStorage();
+    } catch (err) {
+      this.setState({ loading: false, refreshing: false, error: true });
+    }
   };
 
-  renderListItem = ({ item }) => {
-    console.tron.log(item);
-    return <RepositoryItem repository={item} />;
+  loadStorage = async () => {
+    this.setState({ refreshing: true });
+    const listRepositories = await AsyncStorage.getItem('@gitissues:repositories');
+    console.tron.warn(listRepositories);
+    if (listRepositories !== null) {
+      const repo = JSON.parse(listRepositories);
+      this.setState({ repositories: repo });
+    }
+    this.setState({ refreshing: false });
   };
+
+  saveStorage = async () => {
+    const { repositories } = this.state;
+    console.tron.log(repositories);
+    await AsyncStorage.setItem('@gitissues:repositories', JSON.stringify(repositories));
+  };
+
+  renderListItem = ({ item }) => <RepositoryItem repository={item} />;
 
   renderList = () => {
     const { repositories, refreshing } = this.state;
@@ -49,7 +87,7 @@ export default class Welcome extends Component {
   };
 
   render() {
-    const { repository } = this.state;
+    const { repository, loading, error } = this.state;
     return (
       <View style={styles.container}>
         <StatusBar barStyle="dark-content" />
@@ -67,9 +105,14 @@ export default class Welcome extends Component {
             onChangeText={text => this.setState({ repository: text })}
           />
           <TouchableOpacity style={styles.button} onPress={this.loadRepositories}>
-            <Icon name="plus" size={20} />
+            {loading ? (
+              <ActivityIndicator size="small" style={styles.loading} />
+            ) : (
+              <Icon name="plus" size={20} />
+            )}
           </TouchableOpacity>
         </View>
+        {error && <Text style={styles.error}>Repositório não encontrado!</Text>}
         {this.renderList()}
       </View>
     );

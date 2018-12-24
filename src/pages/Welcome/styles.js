@@ -5,9 +5,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.lighter,
-    // padding: metrics.basePadding * 2,
-    // justifyContent: 'center',
-    // alignItems: 'stretch',
   },
   header: {
     height: 50,
@@ -37,6 +34,12 @@ const styles = StyleSheet.create({
   },
   button: {
     margin: metrics.baseMargin,
+  },
+  loading: {
+    color: colors.regular,
+  },
+  error: {
+    color: colors.danger,
   },
 });
 
